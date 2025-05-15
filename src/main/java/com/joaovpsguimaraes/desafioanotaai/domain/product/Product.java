@@ -1,6 +1,5 @@
 package com.joaovpsguimaraes.desafioanotaai.domain.product;
 
-import com.joaovpsguimaraes.desafioanotaai.domain.category.Category;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -18,12 +17,13 @@ public class Product {
     private String description;
     private String ownerId;
     private Integer price;
-    private Category category;
+    private String categoryId;
 
     public Product (ProductDTO productDTO){
         this.title = productDTO.title();
         this.description = productDTO.description();
         this.ownerId = productDTO.ownerId();
         this.price = productDTO.price();
+        this.categoryId = productDTO.categoryId();
     }
 }

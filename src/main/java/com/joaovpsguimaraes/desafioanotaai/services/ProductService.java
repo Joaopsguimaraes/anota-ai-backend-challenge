@@ -1,6 +1,5 @@
 package com.joaovpsguimaraes.desafioanotaai.services;
 
-import com.joaovpsguimaraes.desafioanotaai.domain.category.Category;
 import com.joaovpsguimaraes.desafioanotaai.domain.category.exceptions.CategoryNotFoundException;
 import com.joaovpsguimaraes.desafioanotaai.domain.product.Product;
 import com.joaovpsguimaraes.desafioanotaai.domain.product.ProductDTO;
@@ -26,12 +25,13 @@ public class ProductService {
     }
 
     public Product create(ProductDTO productDTO) {
-        Category category = this.categoryService.findById(productDTO.categoryId()).orElseThrow(CategoryNotFoundException::new);
+        this.categoryService.findById(productDTO.categoryId()).orElseThrow(CategoryNotFoundException::new);
 
         Product product = new Product(productDTO);
-        product.setCategory(category);
+
         this.productRepository.save(product);
-        this.awsSnsService.publishMessage(new MessageDTO(product.getOwnerId()));
+
+        this.awsSnsService.publishMessage(new MessageDTO(product.toString()));
 
         return product;
     }
@@ -50,10 +50,15 @@ public class ProductService {
         if (!productDTO.title().isEmpty()) product.setTitle(productDTO.title());
         if (!productDTO.description().isEmpty()) product.setDescription(productDTO.description());
         if (!(productDTO.price() == null)) product.setPrice(productDTO.price());
-        if (!productDTO.categoryId().isEmpty())
-            this.categoryService.findById(productDTO.categoryId()).ifPresent(product::setCategory);
+
+        if (!productDTO.categoryId().isEmpty()) {
+            this.categoryService.findById(productDTO.categoryId()).orElseThrow(CategoryNotFoundException::new);
+
+            product.setCategoryId(productDTO.categoryId());
+        }
         this.productRepository.save(product);
-        this.awsSnsService.publishMessage(new MessageDTO(product.getOwnerId()));
+
+        this.awsSnsService.publishMessage(new MessageDTO(product.toString()));
 
         return product;
     }
